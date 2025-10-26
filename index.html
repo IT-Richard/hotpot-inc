@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hot Pot Restaurant</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header and Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 50px;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+
+        header.scrolled {
+            background-color: rgb(0, 0, 0);
+        }
+
+        header img.logo {
+            height: 60px;
+            animation: slideInLeft 1s ease-out;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 30px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            position: relative;
+            transition: all 0.3s ease-in-out;
+            padding: 5px 0;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: #ffcc00;
+            transition: width 0.3s ease-in-out;
+        }
+
+        nav ul li a:hover {
+            color: #ffcc00;
+            transform: translateY(-3px);
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        /* Hamburger Menu for Mobile */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            height: 3px;
+            width: 25px;
+            background: #fff;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+
+        nav.active ul {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px 0;
+        }
+
+        nav.active ul li {
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        /* Home Section with Sliding Background */
+        #home {
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden; /* Ensure images don't overflow */
+        }
+
+        .home-background-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            transition: transform 1s ease-in-out; /* Smooth transition for sliding */
+        }
+
+        .home-background-slider .slide-bg {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .home-background-slider .slide-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Overlay for text readability */
+        }
+
+        #home h1 {
+            font-size: 60px;
+            animation: fadeInDown 1.5s ease;
+            z-index: 1;
+        }
+
+        #home p {
+            font-size: 24px;
+            animation: fadeInUp 1.5s ease;
+            z-index: 1;
+        }
+
+        /* Menu Section */
+        #menu {
+            padding: 80px 50px;
+            background-color: #fff;
+            text-align: center;
+        }
+
+        #menu h2 {
+            font-size: 40px;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease;
+        }
+
+        .menu-category {
+            margin-bottom: 40px;
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            cursor: pointer;
+        }
+
+        .menu-category h3 {
+            font-size: 28px;
+            color: #ff6600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ff6600;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .menu-category h3:hover {
+            color: #e65c00;
+            border-color: #e65c00;
+            transform: translateX(5px);
+        }
+
+        .menu-category h3::after {
+            content: '+';
+            font-size: 24px;
+        }
+
+        .menu-category.active h3::after {
+            content: '-';
+        }
+
+        .menu-items {
+            display: none;
+            transition: max-height 0.3s ease;
+        }
+
+        .menu-category.active .menu-items {
+            display: block;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .menu-note {
+            font-style: italic;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        /* Gallery Section with Slider */
+        #gallery {
+            padding: 80px 50px;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        #gallery h2 {
+            font-size: 40px;
+            margin-bottom: 40px;
+        }
+
+        .slider {
+            position: relative;
+            max-width: 300px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .slides {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .slide {
+            min-width: 100%;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide img {
+            width: 100%; /* Make images fill the slide */
+            height: 400px; /* Fixed height for consistency */
+            object-fit: cover; /* Cover the area without distortion */
+            border-radius: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .slide img:hover {
+            transform: scale(1.05); /* Zoom effect on hover */
+        }
+
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .prev {
+            left: 10px;
+        }
+
+        .next {
+            right: 10px;
+        }
+
+        /* Contact Section */
+        #contact {
+            padding: 80px 50px;
+            background-color: #fff;
+            text-align: center;
+        }
+
+        #contact h2 {
+            font-size: 40px;
+            margin-bottom: 40px;
+        }
+
+        #contact p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                padding: 10px 20px;
+                flex-wrap: wrap;
+            }
+
+            header img.logo {
+                height: 50px;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            #home {
+                height: 80vh;
+                background-attachment: scroll; /* Disable parallax on mobile for better performance */
+            }
+
+            #home h1 {
+                font-size: 40px;
+                padding: 0 20px;
+            }
+
+            #home p {
+                font-size: 18px;
+                padding: 0 20px;
+            }
+
+            #menu {
+                padding: 60px 20px;
+            }
+
+            #menu h2 {
+                font-size: 32px;
+            }
+
+            .menu-category h3 {
+                font-size: 24px;
+            }
+
+            .menu-item {
+                font-size: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .menu-item span:last-child {
+                margin-top: 5px;
+                color: #ff6600;
+            }
+
+            #gallery {
+                padding: 60px 20px;
+            }
+
+            #gallery h2 {
+                font-size: 32px;
+            }
+
+            .slider {
+                max-width: 100%;
+            }
+
+            #contact {
+                padding: 60px 20px;
+            }
+
+            #contact h2 {
+                font-size: 32px;
+            }
+
+            #contact p {
+                font-size: 16px;
+            }
+
+            footer {
+                padding: 15px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 10px;
+            }
+
+            #home h1 {
+                font-size: 32px;
+            }
+
+            #home p {
+                font-size: 16px;
+            }
+
+            #menu h2, #gallery h2, #contact h2 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="img/logo.png" alt="Hot Pot Logo" class="logo"> <!-- First image as logo -->
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#menu">Menu</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home">
+        <div class="home-background-slider">
+            <div class="slide-bg" style="background-image: url('img/home_main.jpeg');"></div>
+            <div class="slide-bg" style="background-image: url('img/home.jpeg');"></div>
+        </div>
+        <h1 class="display-3 fw-bold animate__animated animate__fadeInDown">Welcome to Hot Pot Restaurant</h1>
+        <p class="lead animate__animated animate__fadeInUp">Delicious Menu with Quality Foods</p>
+    </section>
+
+    <section id="menu">
+        <h2>Our Menu</h2>
+        <div class="menu-category">
+            <h3>Burgers</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Hamburger</span><span>US$8.50</span></div>
+                <div class="menu-item"><span>Cheese Burger</span><span>US$10.00</span></div>
+                <div class="menu-item"><span>Chicken Burger</span><span>US$10.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Sandwiches</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Club Sandwich</span><span>US$8.00</span></div>
+                <div class="menu-item"><span>Chicken Shawarma</span><span>US$5.00</span></div>
+                <div class="menu-item"><span>Meat Shawarma</span><span>US$7.00</span></div>
+                <div class="menu-item"><span>Meicano Wrap Sandwich</span><span>US$8.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Pizza</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Margarita</span><span>US$12.00</span></div>
+                <div class="menu-item"><span>Chicken</span><span>US$12.00</span></div>
+                <div class="menu-item"><span>Vegetarian</span><span>US$12.00</span></div>
+                <div class="menu-item"><span>Ham & Mushroom</span><span>US$13.00</span></div>
+                <div class="menu-item"><span>Seafood</span><span>US$14.00</span></div>
+                <div class="menu-item"><span>Pepperoni</span><span>US$14.00</span></div>
+                <div class="menu-item"><span>Four Season</span><span>US$15.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Hot Appetizers</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>French Fries Plate</span><span>US$4.00</span></div>
+                <div class="menu-item"><span>Fried Chicken Wings</span><span>US$10.00</span></div>
+                <div class="menu-item"><span>Garlic Bread</span><span>US$5.00</span></div>
+                <div class="menu-item"><span>Golden Shrimps</span><span>US$12.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Kids Corner</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Chicken Nuggets</span><span>US$8.00</span></div>
+                <div class="menu-item"><span>Fish Finger</span><span>US$10.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Cold Appetizers</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Vegetable Plater</span><span>US$8.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Salad</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Potatoes Salad</span><span>US$10.00</span></div>
+                <div class="menu-item"><span>Green Salad</span><span>US$8.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Liberian Main Course</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Grilled Fish Liberian Way</span><span>US$15.00</span></div>
+                <div class="menu-item"><span>African Char Grilled Chicken</span><span>US$15.00</span></div>
+                <div class="menu-item"><span>African Pepper Chicken</span><span>US$15.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>International Main Course</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Grilled Fish Fillet</span><span>US$15.00</span></div>
+                <div class="menu-item"><span>Pepper Stick</span><span>US$18.00</span></div>
+                <div class="menu-item"><span>Mushroom Steak</span><span>US$18.00</span></div>
+                <div class="menu-item"><span>Grill Lobster</span><span>US$20.00</span></div>
+                <div class="menu-item"><span>Lobster Thermidor</span><span>US$22.00</span></div>
+                <div class="menu-item"><span>Grilled Shrimps</span><span>US$18.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Rice</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Vegetable</span><span>US$6.00</span></div>
+                <div class="menu-item"><span>Chicken Fried Rice</span><span>US$8.00</span></div>
+                <div class="menu-item"><span>Beef Fried Rice</span><span>US$12.00</span></div>
+                <div class="menu-item"><span>Shrimps Fried Rice</span><span>US$14.00</span></div>
+                <div class="menu-item"><span>Plain Rice</span><span>US$3.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Beverages</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Water Small (Local)</span><span>US$1.50</span></div>
+                <div class="menu-item"><span>Coke / Fanta / Sprite</span><span>US$2.00</span></div>
+                <div class="menu-item"><span>Xtra Juice</span><span>US$2.00</span></div>
+                <div class="menu-item"><span>Vimto</span><span>US$2.50</span></div>
+                <div class="menu-item"><span>Rox</span><span>US$2.50</span></div>
+                <div class="menu-item"><span>Super & Power Malt</span><span>US$2.50</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Desserts</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Ice Cream</span><span>US$2.00</span></div>
+                <div class="menu-item"><span>Ice Cream (3 Scoops)</span><span>US$5.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Hot Drinks</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Tea</span><span>US$3.00</span></div>
+                <div class="menu-item"><span>Nescafe</span><span>US$3.00</span></div>
+                <div class="menu-item"><span>Herbal Tea</span><span>US$3.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Tobacco</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Marlboro (Red & White)</span><span>US$4.00</span></div>
+                <div class="menu-item"><span>Shisha Service</span><span>US$5.00</span></div>
+                <div class="menu-item"><span>Shisha Flavors</span><span>US$10.00</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Fresh Fruit Juices</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Orange Juice / Mango / Banana Milk / Strawberry / Lemonade / Lime & Ginger</span><span>US$5.00 each</span></div>
+            </div>
+        </div>
+        <div class="menu-category">
+            <h3>Fruit Cocktails</h3>
+            <div class="menu-items">
+                <div class="menu-item"><span>Tropicana Cocktail / Magarita (Virgin) / Pinacolada (Virgin) / Strawberry Banana</span><span>US$7.00 each</span></div>
+            </div>
+        </div>
+        <p class="menu-note">All prices inclusive of GST 10%. Free delivery available from 10:00AM - 9:00PM.</p>
+    </section>
+
+    <section id="gallery">
+        <h2>Gallery</h2>
+        <div class="slider">
+            <div class="slides">
+                <div class="slide"><img src="img/wings.jpeg" alt="Fried Chicken Wings"></div>
+                <div class="slide"><img src="img/pizza.jpeg" alt="Pizza"></div>
+                <div class="slide"><img src="img/burger.jpeg" alt="Cheese Burger"></div>
+            </div>
+            <button class="prev">&#10094;</button>
+            <button class="next">&#10095;</button>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>Contact Us</h2>
+        <p>Phone: 0777496888 / 0887421867</p>
+        <p>Address: 72nd Junction, Somalia Drive, Paynesville, Liberia</p>
+        <p>Open Hours: Mon-Sat 10:00AM - 11:00PM</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Hot Pot Restaurant. All rights reserved.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            header.classList.toggle('scrolled', window.scrollY > 0);
+        });
+
+        // Hamburger Menu Toggle
+        const hamburger = document.querySelector('.hamburger');
+        const nav = document.querySelector('nav');
+
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            if (hamburger.classList.contains('active')) {
+                hamburger.innerHTML = '<span></span><span></span><span></span>';
+                hamburger.querySelectorAll('span')[0].style.transform = 'rotate(45deg) translate(10px, 6px)';
+                hamburger.querySelectorAll('span')[1].style.opacity = '0';
+                hamburger.querySelectorAll('span')[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+            } else {
+                hamburger.innerHTML = '<span></span><span></span><span></span>';
+            }
+        });
+
+        // Accordion for Menu Categories on Mobile
+        const categories = document.querySelectorAll('.menu-category');
+        categories.forEach(category => {
+            category.addEventListener('click', () => {
+                category.classList.toggle('active');
+            });
+        });
+
+        // Gallery Slider
+        let slideIndex = 0;
+        const slides = document.querySelector('.slides');
+        const slideElements = document.querySelectorAll('.slide');
+        const prev = document.querySelector('.prev');
+        const next = document.querySelector('.next');
+
+        function showSlide(n) {
+            if (n >= slideElements.length) slideIndex = 0;
+            if (n < 0) slideIndex = slideElements.length - 1;
+            slides.style.transform = `translateX(${-slideIndex * 100}%)`;
+        }
+
+        prev.addEventListener('click', () => {
+            slideIndex--;
+            showSlide(slideIndex);
+        });
+
+        next.addEventListener('click', () => {
+            slideIndex++;
+            showSlide(slideIndex);
+        });
+
+        // Auto-slide every 5 seconds
+        setInterval(() => {
+            slideIndex++;
+            showSlide(slideIndex);
+        }, 5000);
+
+        // Home Background Slider
+        let homeSlideIndex = 0;
+        const homeSlides = document.querySelector('.home-background-slider');
+        const homeSlideElements = document.querySelectorAll('.home-background-slider .slide-bg');
+
+        function showHomeSlide() {
+            homeSlideIndex++;
+            if (homeSlideIndex >= homeSlideElements.length) {
+                homeSlideIndex = 0;
+            }
+            homeSlides.style.transform = `translateX(${-homeSlideIndex * 100}%)`;
+        }
+
+        // Auto-slide home background every 7 seconds
+        setInterval(showHomeSlide, 7000);
+    </script>
+</body>
+</html>
